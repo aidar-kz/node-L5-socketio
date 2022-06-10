@@ -4,8 +4,10 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
+app.use("/bootstrap", expres.static(__dirname + "/node_modules/bootstrap"));
+
 app.get("/", (req, res) => {
-  res.send("<h1>Привет от сервера!</h1>");
+  res.sendFile(__dirname + "/client.html");
 });
 
 const port = process.env.PORT || 3000;
