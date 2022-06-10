@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="/m-icons/iconfont/material-icons.css" />
     <title>Document</title>
     <style>
+      #messages-container {
+        padding-top: 73px;
+        padding-bottom: 40px;
+      }
       #messages {
         list-style-type: none;
         margin: 0;
@@ -36,7 +40,9 @@
       </div>
     </nav>
 
-    <ul id="messages"></ul>
+    <div id="messages-container">
+      <ul id="messages"></ul>
+    </div>
 
     <div id="forms" class="fixed-bottom">
       <form id="nameForm" class="d-flex">
@@ -123,7 +129,7 @@
       });
 
       socket.on("chat message", function (message) {
-        var msg = `<span class="text-muted">${message.sender}</span> ${message.content}`;
+        var msg = `<span class="text-muted">${message.sender}:</span> ${message.content}`;
         addMessage(msg);
       });
     </script>
