@@ -61,12 +61,15 @@
         event.preventDefault();
         if (msgInput.value) {
           socket.emit("chat message", msgInput.value);
+          var msg = msgInput.value;
+          addMessage(msg, "right");
           msgInput.value = "";
         }
       });
 
-      function addMessage(msg) {
+      function addMessage(msg, align) {
         var li = document.createElement("li");
+        li.style = "text-align: " + align;
         li.innerHTML = msg;
         messages.appendChild(li);
         window.scrollTo(0, document.body.scrollHeight);
@@ -86,7 +89,8 @@
         addMessage(msg);
       });
 
-      socket.on("chat message", function (msg) {
+      socket.on("chat message", function (message) {
+        var msg = `<span class="text-muted">${message.sender}</span> ${message.content}`;
         addMessage(msg);
       });
     </script>

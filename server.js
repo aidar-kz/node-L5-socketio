@@ -39,6 +39,6 @@ io.on("connection", (socket) => {
 
   socket.on("chat message", (msg) => {
     console.log("Новое сообщение:", msg);
-    io.emit("chat message", msg);
+    socket.broadcast.emit("chat message", { sender: socket.username, content: msg });
   });
 });
