@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="/m-icons/iconfont/material-icons.css" />
     <title>Document</title>
     <style>
+      #typingStatus {
+        color: grey;
+        position: absolute;
+        bottom: 5px;
+        font-size: 12px;
+      }
+
       #messages-container {
         padding-top: 73px;
         padding-bottom: 40px;
@@ -29,6 +36,7 @@
     <nav class="navbar fixed-top navbar-dark bg-dark">
       <div class="container-fluid">
         <span class="navbar-brand">Чат</span>
+        <div id="typingStatus"></div>
         <div class="navbar-nav">
           <div class="nav-link" id="userDiv">
             <button class="btn btn-dark d-flex" onclick="logout()">
@@ -65,6 +73,8 @@
       var nameInput = document.getElementById("nameInput");
       var msgForm = document.getElementById("msgForm");
       var msgInput = document.getElementById("msgInput");
+      var typing = false;
+      var typingUsers = [];
       var userDivName = document.getElementById("userDivName");
       var username = localStorage.getItem("username");
 
@@ -100,6 +110,24 @@
         }
       });
 
+      msgInput.addEventListener("input", function () {
+        if (!typing) {
+          typing = true;
+          socket.emit("typing");
+        }
+
+        var lastTypingTime = new Date().getTime();
+
+        setTimeout(function () {
+          var typingTimer = new Date().getTime();
+          var timeDiff = typingTimer - lastTypingTime;
+          if (timeDiff >= 2000 && typing) {
+            typing = false;
+            socket.emit("not typing");
+          }
+        }, 2000);
+      });
+
       function addMessage(msg, align) {
         var li = document.createElement("li");
         li.style = "text-align: " + align;
@@ -114,6 +142,20 @@
         location.reload();
       }
 
+      function updateTypingUsers() {
+        if (typingUsers.length < 1) {
+          typingStatus.textContent = "";
+        } else if (typingUsers.length === 1) {
+          typingStatus.textContent = typingUsers[0] + " печатает...";
+        } else if (typingUsers.length === 2) {
+          typingStatus.textContent = typingUsers[0] + " и " + typingUsers[1] + " печатают...";
+        } else if (typingUsers.length > 2 && typingUsers.length < 5) {
+          typingStatus.textContent = typingUsers.length + " пользователя печатают...";
+        } else {
+          typingStatus.textContent = typingUsers.length + " пользователей печатают...";
+        }
+      }
+
       /**
        * События сокета
        */
@@ -126,6 +168,16 @@
       socket.on("disconnection", function (username) {
         var msg = `<small><i>Пользователь с <b>${username}</b> отключился</i></small>`;
         addMessage(msg);
+      });
+
+      socket.on("typing", function (name) {
+        typingUsers.push(name);
+        updateTypingUsers();
+      });
+
+      socket.on("not typing", function (name) {
+        typingUsers = typingUsers.filter((user) => user !== name);
+        updateTypingUsers();
       });
 
       socket.on("chat message", function (message) {

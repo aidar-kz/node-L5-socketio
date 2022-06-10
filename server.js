@@ -38,6 +38,14 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("disconnection", socket.username);
   });
 
+  socket.on("typing", (name) => {
+    socket.broadcast.emit("typing", socket.username);
+  });
+
+  socket.on("not typing", (name) => {
+    socket.broadcast.emit("not typing", socket.username);
+  });
+
   socket.on("chat message", (msg) => {
     console.log("Новое сообщение:", msg);
     socket.broadcast.emit("chat message", { sender: socket.username, content: msg });
