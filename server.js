@@ -28,14 +28,20 @@ io.use((socket, next) => {
   next();
 });
 
+let users = [];
+
 io.on("connection", (socket) => {
   console.log(`Пользователь ${socket.username} подключился.`);
+  users.push(socket.username);
+  io.emit("users", users);
 
   socket.broadcast.emit("connection", socket.username);
 
   socket.on("disconnect", () => {
     console.log(`Пользователь ${socket.username} отключился.`);
     socket.broadcast.emit("disconnection", socket.username);
+    users = users.filter((user) => user !== socket.username);
+    io.emit("users", users);
   });
 
   socket.on("typing", (name) => {

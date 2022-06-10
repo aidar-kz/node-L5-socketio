@@ -30,6 +30,18 @@
       #messages > li:nth-child(odd) {
         background: #efefef;
       }
+
+      #online {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 110px;
+        background: #eee;
+        font-size: 10px;
+        padding-top: 80px;
+        padding-bottom: 50px;
+      }
     </style>
   </head>
   <body>
@@ -64,6 +76,8 @@
       </form>
     </div>
 
+    <div id="online">Онлайн</div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io({ autoConnect: false });
@@ -73,6 +87,7 @@
       var nameInput = document.getElementById("nameInput");
       var msgForm = document.getElementById("msgForm");
       var msgInput = document.getElementById("msgInput");
+      var online = document.getElementById("online");
       var typing = false;
       var typingUsers = [];
       var userDivName = document.getElementById("userDivName");
@@ -183,6 +198,24 @@
       socket.on("chat message", function (message) {
         var msg = `<span class="text-muted">${message.sender}:</span> ${message.content}`;
         addMessage(msg);
+      });
+
+      socket.on("users", function (users) {
+        online.innerHTML = "";
+
+        var div = document.createElement("div");
+        div.innerHTML = "Онлайн: <b>" + users.length + "</b>";
+        div.style = "padding-left: 10px";
+        online.appendChild(div);
+
+        var ul = document.createElement("ul");
+        users.forEach(function (user) {
+          var li = document.createElement("li");
+          li.textContent = user;
+          ul.appendChild(li);
+        });
+        ul.style = "padding-inline-start: 20px";
+        online.appendChild(ul);
       });
     </script>
   </body>
