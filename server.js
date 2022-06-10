@@ -24,4 +24,9 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`Пользователь с ID ${socket.id} отключился.`);
   });
+
+  socket.on("chat message", (msg) => {
+    console.log("Новое сообщение:", msg);
+    io.emit("chat message", msg);
+  });
 });

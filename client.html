@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css" />
     <title>Document</title>
+    <style>
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages > li {
+        padding: 0.5rem 1rem;
+      }
+      #messages > li:nth-child(odd) {
+        background: #efefef;
+      }
+    </style>
   </head>
   <body>
     <ul id="messages"></ul>
@@ -20,6 +33,29 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
+
+      var messages = document.getElementById("messages");
+      var msgForm = document.getElementById("msgForm");
+      var msgInput = document.getElementById("msgInput");
+
+      msgForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (msgInput.value) {
+          socket.emit("chat message", msgInput.value);
+          msgInput.value = "";
+        }
+      });
+
+      /**
+       * События сокета
+       */
+
+      socket.on("chat message", function (msg) {
+        var li = document.createElement("li");
+        li.textContent = msg;
+        messages.appendChild(li);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
     </script>
   </body>
 </html>
