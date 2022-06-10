@@ -24,6 +24,11 @@
     <ul id="messages"></ul>
 
     <div id="forms" class="fixed-bottom">
+      <form id="nameForm" class="d-flex">
+        <input type="text" id="nameInput" class="form-control" placeholder="Введите ваше имя" />
+        <button class="btn btn-outline-primary">Готово</button>
+      </form>
+
       <form id="msgForm" class="d-flex">
         <input type="text" id="msgInput" autocomplete="off" class="form-control" />
         <button class="btn btn-success">Отправить</button>
@@ -32,11 +37,25 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
+      var socket = io({ autoConnect: false });
 
       var messages = document.getElementById("messages");
+      var nameForm = document.getElementById("nameForm");
+      var nameInput = document.getElementById("nameInput");
       var msgForm = document.getElementById("msgForm");
       var msgInput = document.getElementById("msgInput");
+
+      msgForm.classList.add("d-none");
+
+      nameForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (nameInput.value) {
+          socket.auth = { username: nameInput.value };
+          socket.connect();
+          nameForm.classList.add("d-none");
+          msgForm.classList.remove("d-none");
+        }
+      });
 
       msgForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -57,13 +76,13 @@
        * События сокета
        */
 
-      socket.on("connection", function (id) {
-        var msg = `<small><i>Пользователь с iD <b>${id}</b> подключился</i></small>`;
+      socket.on("connection", function (username) {
+        var msg = `<small><i>Пользователь <b>${username}</b> подключился</i></small>`;
         addMessage(msg);
       });
 
-      socket.on("disconnection", function (id) {
-        var msg = `<small><i>Пользователь с iD <b>${id}</b> отключился</i></small>`;
+      socket.on("disconnection", function (username) {
+        var msg = `<small><i>Пользователь с <b>${username}</b> отключился</i></small>`;
         addMessage(msg);
       });
 

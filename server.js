@@ -18,14 +18,23 @@ server.listen(port, () => {
   console.log(`Сервер слушает порт ${port}`);
 });
 
-io.on("connection", (socket) => {
-  console.log(`Пользователь с ID ${socket.id} подключился.`);
+io.use((socket, next) => {
+  const username = socket.handshake.auth.username;
+  if (!username) {
+    return next(new Error("Неправильное имя пользователя"));
+  }
+  socket.username = username;
+  next();
+});
 
-  socket.broadcast.emit("connection", socket.id);
+io.on("connection", (socket) => {
+  console.log(`Пользователь ${socket.username} подключился.`);
+
+  socket.broadcast.emit("connection", socket.username);
 
   socket.on("disconnect", () => {
-    console.log(`Пользователь с ID ${socket.id} отключился.`);
-    socket.broadcast.emit("disconnection", socket.id);
+    console.log(`Пользователь ${socket.username} отключился.`);
+    socket.broadcast.emit("disconnection", socket.username);
   });
 
   socket.on("chat message", (msg) => {
