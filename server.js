@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 app.use("/bootstrap", express.static(__dirname + "/node_modules/bootstrap"));
+app.use("/m-icons", express.static(__dirname + "/node_modules/material-icons"));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/client.html");

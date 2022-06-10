@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/m-icons/iconfont/material-icons.css" />
     <title>Document</title>
     <style>
       #messages {
@@ -21,6 +22,20 @@
     </style>
   </head>
   <body>
+    <nav class="navbar fixed-top navbar-dark bg-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand">Чат</span>
+        <div class="navbar-nav">
+          <div class="nav-link" id="userDiv">
+            <button class="btn btn-dark d-flex" onclick="logout()">
+              <span id="userDivName"></span>
+              <i class="material-icons ms-2">logout</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
     <ul id="messages"></ul>
 
     <div id="forms" class="fixed-bottom">
@@ -44,18 +59,30 @@
       var nameInput = document.getElementById("nameInput");
       var msgForm = document.getElementById("msgForm");
       var msgInput = document.getElementById("msgInput");
+      var userDivName = document.getElementById("userDivName");
+      var username = localStorage.getItem("username");
 
-      msgForm.classList.add("d-none");
-
-      nameForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        if (nameInput.value) {
-          socket.auth = { username: nameInput.value };
-          socket.connect();
-          nameForm.classList.add("d-none");
-          msgForm.classList.remove("d-none");
-        }
-      });
+      if (username) {
+        socket.auth = { username };
+        socket.connect();
+        nameForm.classList.add("d-none");
+        userDivName.textContent = username;
+      } else {
+        msgForm.classList.add("d-none");
+        userDiv.classList.add("d-none");
+        nameForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          if (nameInput.value) {
+            socket.auth = { username: nameInput.value };
+            socket.connect();
+            nameForm.classList.add("d-none");
+            msgForm.classList.remove("d-none");
+            userDivName.textContent = nameInput.value;
+            userDiv.classList.remove("d-none");
+            localStorage.setItem("username", nameInput.value);
+          }
+        });
+      }
 
       msgForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -73,6 +100,12 @@
         li.innerHTML = msg;
         messages.appendChild(li);
         window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      function logout() {
+        localStorage.removeItem("username");
+        socket.disconnect();
+        location.reload();
       }
 
       /**
