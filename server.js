@@ -4,7 +4,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
-app.use("/bootstrap", expres.static(__dirname + "/node_modules/bootstrap"));
+app.use("/bootstrap", express.static(__dirname + "/node_modules/bootstrap"));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/client.html");
