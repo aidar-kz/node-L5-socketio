@@ -21,8 +21,11 @@ server.listen(port, () => {
 io.on("connection", (socket) => {
   console.log(`Пользователь с ID ${socket.id} подключился.`);
 
+  socket.broadcast.emit("connection", socket.id);
+
   socket.on("disconnect", () => {
     console.log(`Пользователь с ID ${socket.id} отключился.`);
+    socket.broadcast.emit("disconnection", socket.id);
   });
 
   socket.on("chat message", (msg) => {

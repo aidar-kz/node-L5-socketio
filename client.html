@@ -46,15 +46,29 @@
         }
       });
 
+      function addMessage(msg) {
+        var li = document.createElement("li");
+        li.innerHTML = msg;
+        messages.appendChild(li);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
       /**
        * События сокета
        */
 
+      socket.on("connection", function (id) {
+        var msg = `<small><i>Пользователь с iD <b>${id}</b> подключился</i></small>`;
+        addMessage(msg);
+      });
+
+      socket.on("disconnection", function (id) {
+        var msg = `<small><i>Пользователь с iD <b>${id}</b> отключился</i></small>`;
+        addMessage(msg);
+      });
+
       socket.on("chat message", function (msg) {
-        var li = document.createElement("li");
-        li.textContent = msg;
-        messages.appendChild(li);
-        window.scrollTo(0, document.body.scrollHeight);
+        addMessage(msg);
       });
     </script>
   </body>
